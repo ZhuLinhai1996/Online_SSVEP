@@ -4,8 +4,12 @@ clear all
 close all
 clc
 
-time =5;
+ for i = 1:10
+        buffer(i) = 0;
+ end
+ buffer_count = 0;
 
+time =5;
 Fs = 512; %采样频率
 T = 1 / Fs;%采样时间
 L = Fs * time;  %信号长度
@@ -104,10 +108,23 @@ while 1
         [xmax,index] = max(y);%找到幅值最大的点，返回的index是该点的位置
         maxfre=x(index)%最大幅值的频率值
         
-    %% 将指令写入Result.txt中
-    fid = fopen('Result.txt','w');  
-    fprintf( fid,'%s',int2str(maxfre) );   
-    fclose(fid);
+        %% 将数据写到大小为10的buffer里
+        if(buffer_count<=10)
+            buffer(buffer_count+1) = maxfre;
+            buffer_count = buffer_count+1;
+        end
+        if(buffer_count > 10)
+            for i = 1:9
+               buffer(i) = buffer(i+1);  
+            end
+            buffer(10) = maxfre;
+           %% 将指令写入Result.txt中
+            fid = fopen('Result.txt','w'); 
+            for i = 1:10
+               fprintf( fid,'%s\n',int2str(buffer(i)) );
+            end
+            fclose(fid);
+        end
     
     end
 
